@@ -11,4 +11,7 @@ const method2 = (req: Request, res: Response): void => {
 }
 
 // Export of all methods as object
-export { method1, method2 };
+export {
+    method1,
+    method2
+};
