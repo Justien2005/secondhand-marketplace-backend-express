@@ -65,4 +65,7 @@ router.get('/delete-wishlist/:product_id', auth.verifyToken, product.deleteWishl
 // Role
 router.get('/roles', role.roleList);
 
+// Admin Dashboard
+router.get('/dashboard-data', admin.dashboardData);
+
 export default router;

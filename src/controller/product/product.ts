@@ -627,7 +627,7 @@ async function getProductBids(productId: number) {
 async function queryProductCatalog(productId: any = null) {
     try {
         const queryParameter: any = [];
-        let queryProduct = '';
+        let queryProduct = ' AND ms_product.approved = 1 ';
         let queryMore = '';
         if (productId) {
             queryProduct = ' AND ms_product.product_id = ? ';
@@ -655,7 +655,6 @@ async function queryProductCatalog(productId: any = null) {
                 AND ms_product_item.deleted_at IS NULL
                 AND ms_product_item.available = 1
             WHERE ms_product.deleted_at IS NULL
-                AND ms_product.approved = 1
                 ${queryProduct}
             GROUP BY ms_product.product_id,
                 ms_product.product_name,
