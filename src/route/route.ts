@@ -32,7 +32,7 @@ router.get('/product-all', auth.verifyToken, product.productAll);
 router.get('/product-conditions', auth.verifyToken, product.productConditions);
 router.get('/product-categories', auth.verifyToken, product.productCategories);
 router.post('/product-save', auth.verifyToken, upload.single('photo'), product.saveProduct);
-router.get('/product', auth.verifyToken, product.productCatalog);
+router.post('/product-catalog', auth.verifyToken, product.productCatalog);
 router.get('/product-detail/:product_id', auth.verifyToken, product.productDetail);
 router.post('/product-status/:product_id/:status', auth.verifyToken, product.productStatusChange);
 router.post('/product-price-change', auth.verifyToken, product.productPriceChange);

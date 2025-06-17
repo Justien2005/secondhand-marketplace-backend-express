@@ -34,7 +34,7 @@ export const productAll = async (req: Request, res: Response): Promise<void> => 
 export const productCatalog = async (req: Request, res: Response): Promise<void> => {
     try {
 
-        const products: any = await queryProductCatalog();
+        const products: any = await queryProductCatalogBuyer(req.body);
 
         const productAll = products.map((product: any) => {
             let photoDataUrl = null;
@@ -623,6 +623,66 @@ async function getProductBids(productId: number) {
     const [bids]: any = await connection.query(bidQuery, [productId]);
     return bids || [];
 }
+
+async function queryProductCatalogBuyer(params: any) {
+    try {
+        const queryParameter: any = [];
+        let queryProduct = ' AND ms_product.approved = 1 ';
+        let queryMore = '';
+
+        if (params.search) {
+            queryProduct += ' AND ms_product.product_name LIKE ? ';
+            queryParameter.push(`%${params.search}%`);
+        }
+
+        if (params.category) {
+            queryProduct += ' AND ms_product.category_id = ? ';
+            queryParameter.push(+params.category);
+        }
+
+        const query = `
+            SELECT ms_product.product_id,
+                ms_product.product_name,
+                ms_product.price,
+                count(ms_product_item.product_id) AS stock,
+                ms_product.location,
+                product_condition.condition_type,
+                ms_product.photo_data,
+                ms_product.photo_mime_type
+                ${queryMore}
+            FROM ms_product
+            JOIN ms_product_category ON ms_product.category_id = ms_product_category.category_id
+                AND ms_product_category.deleted_at IS NULL
+            JOIN ms_seller ON ms_product.seller_id = ms_seller.seller_id
+                AND ms_seller.deleted_at IS NULL
+            JOIN product_condition ON ms_product.condition_id = product_condition.condition_id
+            LEFT JOIN ms_product_item ON ms_product.product_id = ms_product_item.product_id
+                AND ms_product_item.deleted_at IS NULL
+                AND ms_product_item.available = 1
+            WHERE ms_product.deleted_at IS NULL
+                ${queryProduct}
+            GROUP BY ms_product.product_id,
+                ms_product.product_name,
+                ms_product.price,
+                ms_product.location,
+                ms_product.photo_data,
+                ms_product.photo_mime_type,
+                product_condition.condition_type
+        `;
+
+        const [products]: any = await connection.query(query, queryParameter);
+
+
+        if (products && products.length > 0) {
+            products.forEach((p: any) => p.bids = []);
+        }
+
+        return products;
+    } catch (error) {
+        throw new Error("Error [queryProductCatalog]: " + error);
+    }
+};
+
 
 async function queryProductCatalog(productId: any = null) {
     try {
