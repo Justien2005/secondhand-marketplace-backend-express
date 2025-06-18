@@ -259,7 +259,9 @@ export const makeOrder = async (req: Request, res: Response, responseOnly: any =
             }
         }
 
-        if (responseOnly) {
+        console.log(responseOnly === true)
+
+        if (responseOnly === true) {
             return;
         };
         ResponseHandler.success(res, null);
